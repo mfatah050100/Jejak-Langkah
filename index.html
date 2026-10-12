@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jejak Langkah - Catatan Perjalanan Hidupku</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
+                        display: ['Cinzel', 'serif'],
+                    },
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 114, 128, 0.8);
+        }
+
+        .glass-blur {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-top: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .book-card {
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .book-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.35);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.35s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .zoomable-image {
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+        .zoomable-image:hover {
+            transform: scale(1.015);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 dark:bg-stone-950 dark:text-stone-100 min-h-screen flex flex-col font-sans transition-colors duration-300 pb-20">
+
+    <header class="sticky top-0 z-30 bg-stone-50/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('home')">
+                <div class="w-10 h-10 rounded-full bg-amber-800 dark:bg-amber-600 text-white flex items-center justify-center font-display font-bold text-lg shadow-md">
+                    JL
+                </div>
+                <div>
+                    <h1 class="font-display font-semibold text-lg sm:text-xl tracking-wide text-stone-900 dark:text-amber-100">Jejak Langkah</h1>
+                    <p class="text-xs text-stone-500 dark:text-stone-400 font-serif italic">Catatan Perjalanan Hidup</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-full hover:bg-stone-200 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors" title="Ubah Tema">
+                    <i id="theme-icon" class="fas fa-moon text-lg"></i>
+                </button>
+
+                <!-- Tombol Statistik Pengunjung (Hanya Tampil Jika Mode Admin Aktif) -->
+                <button id="admin-stats-btn" onclick="openStatsModal()" class="hidden inline-flex items-center space-x-2 bg-stone-200 hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-100 px-3.5 py-2 rounded-xl text-sm font-medium transition-all">
+                    <i class="fas fa-chart-line text-amber-600 dark:text-amber-400"></i>
+                    <span class="hidden sm:inline">Statistik</span>
+                </button>
+
+                <!-- Tombol Tulis Buku Baru (Hanya tampil jika Mode Admin Aktif) -->
+                <button id="admin-add-book-btn" onclick="openAddBookModal()" class="hidden inline-flex items-center space-x-2 bg-amber-800 hover:bg-amber-900 dark:bg-amber-700 dark:hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm hover:shadow">
+                    <i class="fas fa-plus text-xs"></i>
+                    <span class="hidden sm:inline">Tulis Buku Baru</span>
+                    <span class="sm:hidden">Tambah</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <!-- SECTION 1: HOME (Grid Buku 2 Kolom Bersebelahan dengan Cover & Blur Glassmorphism Title) -->
+        <section id="home-section" class="space-y-8 fade-in">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
+                    Koleksi Buku Perjalanan Hidup
+                </h2>
+                <p class="font-serif text-stone-600 dark:text-stone-400 text-sm sm:text-base leading-relaxed">
+                    Setiap langkah menyimpan cerita, setiap kenangan membentuk siapa kita hari ini. Jelajahi lembaran memori dan kisah hidup yang tertuang dalam buku-buku di bawah ini.
+                </p>
+            </div>
+
+            <!-- Grid 2 Kotak Bersebelahan untuk Cover Buku -->
+            <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 pt-4">
+                <!-- Dynamic Books Rendered Here -->
+            </div>
+        </section>
+
+        <!-- SECTION 2: READER VIEW (Membaca Bab & Konten Berisi Teks + Foto) -->
+        <section id="reader-section" class="hidden space-y-8 fade-in">
+            <!-- Navigasi Kembali & Tools Admin Buku -->
+            <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
+                <button onclick="showSection('home')" class="inline-flex items-center space-x-2 text-xs font-semibold text-stone-600 dark:text-stone-400 hover:text-amber-800 dark:hover:text-amber-400 transition-colors">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Kembali ke Rak Buku</span>
+                </button>
+
+                <div id="admin-edit-book-btn-container" class="hidden">
+                    <button onclick="editCurrentBook()" class="inline-flex items-center space-x-1.5 bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 px-3 py-1.5 rounded-xl text-xs font-medium transition-all">
+                        <i class="fas fa-pen text-amber-600"></i>
+                        <span>Edit Buku Ini</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Sidebar Daftar Bab -->
+                <div class="lg:col-span-1 space-y-4">
+                    <div class="bg-white dark:bg-stone-900 rounded-3xl p-5 border border-stone-200 dark:border-stone-800 shadow-sm sticky top-28">
+                        <h3 id="reader-book-title" class="font-display font-bold text-lg text-stone-900 dark:text-stone-100 mb-3 pb-3 border-b border-stone-100 dark:border-stone-800">
+                            Judul Buku
+                        </h3>
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">Daftar Bab / Chapter</p>
+                        <div id="chapters-list" class="space-y-1.5 max-h-[50vh] overflow-y-auto pr-1">
+                            <!-- Dynamic Chapter Buttons -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konten Utama Bab (Teks & Foto) -->
+                <div class="lg:col-span-3 space-y-8">
+                    <article class="bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-10 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+                        <div>
+                            <span id="reader-chapter-number" class="text-xs font-bold tracking-widest uppercase text-amber-800 dark:text-amber-400">BAB 1</span>
+                            <h2 id="reader-chapter-title" class="font-display font-semibold text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 mt-1">
+                                Judul Bab
+                            </h2>
+                        </div>
+
+                        <hr class="border-stone-100 dark:border-stone-800">
+
+                        <!-- Content blocks container (Text & Images interleaved) -->
+                        <div id="reader-chapter-content" class="space-y-6 font-serif">
+                            <!-- Dynamic blocks -->
+                        </div>
+
+                        <!-- Navigasi Antar Bab -->
+                        <div class="flex items-center justify-between pt-8 border-t border-stone-100 dark:border-stone-800">
+                            <button id="prev-chapter-btn" onclick="navigateChapter(-1)" class="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold hover:bg-stone-100 dark:hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fas fa-chevron-left mr-1"></i> Bab Sebelumnya
+                            </button>
+                            <span id="chapter-progress-text" class="text-xs text-stone-400 font-sans">Bab 1 dari 2</span>
+                            <button id="next-chapter-btn" onclick="navigateChapter(1)" class="px-4 py-2 rounded-xl bg-amber-800 text-white text-xs font-semibold hover:bg-amber-900 disabled:opacity-40 disabled:cursor-not-allowed">
+                                Bab Selanjutnya <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- SECTION: GLOBAL BOOK COMMENTS (Komentar Keseluruhan Buku) -->
+                    <section class="bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border border-stone-200 dark:border-stone-800 shadow-sm space-y-6">
+                        <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-4">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400 flex items-center justify-center text-sm">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <h3 class="font-display font-semibold text-lg text-stone-900 dark:text-stone-100">Kesan & Komentar Pembaca</h3>
+                            </div>
+                            <span id="comment-count-badge" class="text-xs bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 px-3 py-1 rounded-full font-medium">0 Komentar</span>
+                        </div>
+
+                        <!-- Form Kirim Komentar (Client/Pengunjung) -->
+                        <form onsubmit="submitComment(event)" class="space-y-4 bg-stone-50 dark:bg-stone-800/60 p-4 sm:p-5 rounded-2xl border border-stone-200 dark:border-stone-700">
+                            <p class="text-xs font-semibold text-stone-700 dark:text-stone-300">Tinggalkan pesan atau apresiasi untuk buku ini:</p>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <input type="text" id="comment-author-input" placeholder="Ketik Nama Anda..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-1 focus:ring-amber-800">
+                                </div>
+                                <div class="flex items-center space-x-2 pt-1 sm:pt-0">
+                                    <label class="flex items-center space-x-2 cursor-pointer text-xs text-stone-600 dark:text-stone-300 select-none">
+                                        <input type="checkbox" id="is-anonymous-checkbox" onchange="toggleAnonymousCheckbox(this)" class="rounded text-amber-800 focus:ring-amber-800 w-4 h-4">
+                                        <span class="font-medium">Kirim sebagai Anonim</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <textarea id="comment-text-input" rows="3" required placeholder="Tulis komentar atau kesan Anda di sini..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-1 focus:ring-amber-800 leading-relaxed"></textarea>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button type="submit" class="px-5 py-2 bg-amber-800 hover:bg-amber-900 text-white rounded-xl text-xs font-semibold shadow-sm transition-all">
+                                    Kirim Komentar <i class="fas fa-paper-plane ml-1"></i>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Daftar Komentar -->
+                        <div id="comments-list-container" class="space-y-3">
+                            <!-- Dynamic comments -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL: ADMIN STATISTIK / ANALYTICS -->
+    <div id="stats-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-stone-900 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto border border-stone-200 dark:border-stone-800 shadow-2xl p-6 sm:p-8 relative fade-in">
+            <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-4 mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-400 flex items-center justify-center text-lg">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-semibold text-xl text-stone-900 dark:text-stone-100">Statistik & Frekuensi Kunjungan</h3>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">Laporan aktivitas pengunjung web Anda</p>
+                    </div>
+                </div>
+                <button onclick="closeStatsModal()" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-lg">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Overview Cards Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <div class="bg-stone-50 dark:bg-stone-800/80 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 text-center">
+                    <span class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Total Kunjungan</span>
+                    <span id="stat-total-views" class="font-display text-2xl font-bold text-amber-800 dark:text-amber-400">0</span>
+                </div>
+                <div class="bg-stone-50 dark:bg-stone-800/80 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 text-center">
+                    <span class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Pengunjung Unik</span>
+                    <span id="stat-unique-visitors" class="font-display text-2xl font-bold text-stone-800 dark:text-stone-100">0</span>
+                </div>
+                <div class="bg-stone-50 dark:bg-stone-800/80 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 text-center">
+                    <span class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Total Buku</span>
+                    <span id="stat-total-books" class="font-display text-2xl font-bold text-stone-800 dark:text-stone-100">0</span>
+                </div>
+                <div class="bg-stone-50 dark:bg-stone-800/80 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 text-center">
+                    <span class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Total Komentar</span>
+                    <span id="stat-total-comments" class="font-display text-2xl font-bold text-stone-800 dark:text-stone-100">0</span>
+                </div>
+            </div>
+
+            <!-- Daily Visits Table & Book Activity -->
+            <div class="space-y-6">
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-3 flex items-center">
+                        <i class="fas fa-calendar-day mr-2 text-amber-700"></i> Riwayat Kunjungan Harian (7 Hari Terakhir)
+                    </h4>
+                    <div class="bg-stone-50 dark:bg-stone-800/60 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 font-semibold uppercase text-[10px] border-b border-stone-200 dark:border-stone-700">
+                                <tr>
+                                    <th class="py-2.5 px-4">Tanggal</th>
+                                    <th class="py-2.5 px-4 text-right">Jumlah Sesi / Tampilan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-views-tbody" class="divide-y divide-stone-200 dark:divide-stone-700/60 text-stone-700 dark:text-stone-300">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-3 flex items-center">
+                        <i class="fas fa-fire mr-2 text-amber-700"></i> Tingkat Popularitas Buku (Pembacaan)
+                    </h4>
+                    <div id="book-popularity-container" class="space-y-2">
+                        <!-- Dynamic list -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-stone-100 dark:border-stone-800 flex justify-between items-center">
+                <button onclick="resetAnalyticsData()" class="text-[11px] text-red-500 hover:text-red-700 font-medium">
+                    <i class="fas fa-trash-alt mr-1"></i> Reset Data Statistik
+                </button>
+                <button onclick="closeStatsModal()" class="px-5 py-2 rounded-xl bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 text-xs font-semibold">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN PIN INPUT -->
+    <div id="pin-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl max-w-xs w-full p-6 border border-stone-200 dark:border-stone-800 shadow-xl text-center fade-in">
+            <div class="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-key text-lg"></i>
+            </div>
+            <h3 class="font-display font-semibold text-base text-stone-900 dark:text-stone-100">Akses Pemilik / Admin</h3>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mt-1 mb-4">Masukkan PIN untuk mengaktifkan mode penulis buku. (Default: <strong>1234</strong>)</p>
+            
+            <input type="password" id="admin-pin-input" maxlength="6" placeholder="Masukkan PIN" class="w-full text-center tracking-widest text-lg py-2 rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-800 mb-4">
+            
+            <div class="flex space-x-2">
+                <button onclick="closePinModal()" class="w-1/2 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-600 dark:text-stone-300">Batal</button>
+                <button onclick="verifyAdminPin()" class="w-1/2 py-2 rounded-xl bg-amber-800 text-white text-xs font-semibold">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT BOOK & CHAPTER BLOCKS -->
+    <div id="book-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-stone-900 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-stone-200 dark:border-stone-800 shadow-2xl p-6 sm:p-8 relative fade-in">
+            <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-4 mb-6">
+                <h3 id="modal-heading" class="font-display font-semibold text-xl text-stone-900 dark:text-stone-100">
+                    Tambah Buku Perjalanan Baru
+                </h3>
+                <button onclick="closeBookModal()" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 text-lg">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="book-form" onsubmit="handleBookSubmit(event)" class="space-y-6">
+                <input type="hidden" id="edit-book-id" value="">
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-stone-500 dark:text-stone-400 mb-2">Judul Buku</label>
+                    <input type="text" id="form-book-title" required placeholder="Contoh: Perjalanan Menembus Impian" class="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-800 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-stone-500 dark:text-stone-400 mb-2">Foto Cover Buku</label>
+                    <div class="space-y-3">
+                        <input type="url" id="form-book-cover-url" placeholder="Masukkan URL Gambar Cover (https://...)" class="w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-800 text-sm">
+                        
+                        <div class="flex items-center space-x-2 text-xs text-stone-400">
+                            <span class="flex-grow border-t border-stone-200 dark:border-stone-800"></span>
+                            <span>atau unggah dari galeri/laptop</span>
+                            <span class="flex-grow border-t border-stone-200 dark:border-stone-800"></span>
+                        </div>
+
+                        <input type="file" id="form-book-cover-file" accept="image/*" onchange="handleCoverUpload(event)" class="w-full text-xs text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-900 hover:file:bg-amber-200 cursor-pointer">
+                    </div>
+                </div>
+
+                <div class="border-t border-stone-100 dark:border-stone-800 pt-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="text-xs font-semibold uppercase text-stone-500 dark:text-stone-400">Daftar Bab & Cerita Perjalanan</label>
+                        <button type="button" onclick="addChapterInput()" class="text-xs font-semibold text-amber-800 dark:text-amber-400 hover:underline">
+                            + Tambah Bab Baru
+                        </button>
+                    </div>
+
+                    <div id="chapters-form-container" class="space-y-6 max-h-[45vh] overflow-y-auto pr-1">
+                        <!-- Dynamic chapter editor blocks -->
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-stone-100 dark:border-stone-800">
+                    <button type="button" id="delete-book-btn" onclick="deleteCurrentBookModal()" class="hidden text-xs text-red-600 hover:text-red-700 dark:text-red-400 font-medium">
+                        <i class="fas fa-trash-alt mr-1"></i> Hapus Buku
+                    </button>
+                    <div class="flex space-x-3 ml-auto">
+                        <button type="button" onclick="closeBookModal()" class="px-5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-xs font-semibold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-800 dark:bg-amber-700 hover:bg-amber-900 dark:hover:bg-amber-600 text-white text-xs font-semibold shadow-sm">
+                            Simpan Buku
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: IMAGE LIGHTBOX ZOOM -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 hidden" onclick="closeLightbox()">
+        <button class="absolute top-6 right-6 text-white text-2xl p-2 hover:text-stone-300 transition-colors">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="Zoomed Photo" class="max-w-full max-h-[80vh] rounded-2xl shadow-2xl object-contain" onclick="event.stopPropagation()">
+        <p id="lightbox-caption" class="text-stone-300 font-serif italic text-sm mt-4 text-center max-w-xl" onclick="event.stopPropagation()"></p>
+    </div>
+
+    <!-- Floating Admin Toggle Footer Bar -->
+    <footer class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 py-3 px-4 shadow-lg transition-colors">
+        <div class="max-w-6xl mx-auto flex items-center justify-between text-xs">
+            <div class="flex items-center space-x-2 text-stone-500 dark:text-stone-400">
+                <i id="admin-icon" class="fas fa-user-lock text-amber-600 dark:text-amber-500"></i>
+                <span id="admin-status-text" class="font-medium">Mode Admin (Off)</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="handleAdminToggle()" class="px-3 py-1.5 rounded-lg bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 font-medium transition-all">
+                    <i class="fas fa-shield-alt mr-1 text-amber-700"></i> Toggle Admin Mode
+                </button>
+                <span class="text-stone-300 dark:text-stone-700">|</span>
+                <p class="text-[11px] text-stone-400 hidden sm:block">© <span id="current-year"></span> Jejak Langkah</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const DEFAULT_PIN = "1234"; // PIN rahasia untuk masuk ke Mode Admin
+        let isAdminMode = false;
+
+        // Analytics Tracking Data State
+        let analyticsData = {
+            totalViews: 0,
+            uniqueVisitors: 0,
+            dailyViews: {}, 
+            bookViews: {}   
+        };
+
+        const defaultBooks = [
+            {
+                id: "book-1",
+                title: "Jejak Awal di Kota Kenangan",
+                cover: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+                chapters: [
+                    {
+                        title: "Bab 1: Pagi di Kampung Halaman",
+                        blocks: [
+                            {
+                                type: "text",
+                                content: "Masa kecilku dihabiskan di sebuah kota kecil yang tenang. Suasana pagi hari selalu dihiasi kabut tipis dan aroma tanah basah setelah hujan semalaman. Di sinilah kisah hidupku dimulai, di tengah kehangatan keluarga sederhana yang selalu mengajarkan pentingnya bermimpi besar."
+                            },
+                            {
+                                type: "image",
+                                url: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1000&q=80",
+                                caption: "Pemandangan bukit dekat rumah tempatku biasa menghabiskan senja."
+                            },
+                            {
+                                type: "text",
+                                content: "Teringat jelas ketika aku sering duduk di tepi jendela kamar, memandangi bintang-bintang sambil membayangkan seperti apa dunia di luar sana. Tempat ini membentuk pondasi diriku: nilai kejujuran, ketangguhan, dan rasa ingin tahu yang tak pernah padam."
+                            }
+                        ]
+                    },
+                    {
+                        title: "Bab 2: Langkah Pertama Menuju Kota Besar",
+                        blocks: [
+                            {
+                                type: "text",
+                                content: "Keputusan merantau untuk menuntut ilmu dan mengejar cita-cita adalah salah satu keputusan terbesar dalam hidupku. Mengemas koper tua berisi baju dan harapan, aku berpamitan dengan orang tua dengan air mata yang ditahan."
+                            },
+                            {
+                                type: "image",
+                                url: "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1000&q=80",
+                                caption: "Stasiun kereta tempat perjalanan baruku dimulai."
+                            },
+                            {
+                                type: "text",
+                                content: "Setibanya di kota besar, segalanya terasa begitu cepat dan asing. Suara bising kendaraan dan deretan gedung tinggi menyambutku. Di sinilah perjuangan sesungguhnya dimulai—sebuah fase di mana aku belajar berdiri di atas kaki sendiri."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: "book-2",
+                title: "Menembus Batas & Menemukan Diri",
+                cover: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+                chapters: [
+                    {
+                        title: "Bab 1: Badai dan Ujian Kehidupan",
+                        blocks: [
+                            {
+                                type: "text",
+                                content: "Tidak ada perjalanan yang selalu mulus. Ada masa di mana kegagalan datang bertubi-tubi, meruntuhkan keyakinan yang telah kubangun bertahun-tahun."
+                            },
+                            {
+                                type: "image",
+                                url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+                                caption: "Menepi sejenak di tepi pantai untuk menenangkan pikiran."
+                            },
+                            {
+                                type: "text",
+                                content: "Namun, justru di titik terendah itulah aku menemukan kekuatan yang tak pernah kuketahui sebelumnya. Kegagalan bukanlah akhir dari cerita, melainkan pelajaran berharga untuk membentuk karakter yang lebih tangguh."
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let books = [];
+        let currentBookId = null;
+        let currentChapterIndex = 0;
+        let uploadedCoverBase64 = null;
+        let commentsData = {};
+
+        window.onload = function() {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            loadBooks();
+            loadComments();
+            loadAnalytics();
+            recordVisit(); 
+            renderBooksGrid();
+            initTheme();
+            updateAdminUI();
+        };
+
+        function loadBooks() {
+            const saved = localStorage.getItem('jejak_langkah_books_v2');
+            if (saved) {
+                try {
+                    books = JSON.parse(saved);
+                } catch (e) {
+                    books = defaultBooks;
+                }
+            } else {
+                books = defaultBooks;
+                saveBooks();
+            }
+        }
+
+        function saveBooks() {
+            localStorage.setItem('jejak_langkah_books_v2', JSON.stringify(books));
+        }
+
+        function loadComments() {
+            const saved = localStorage.getItem('jejak_langkah_comments_global_v1');
+            if (saved) {
+                try {
+                    commentsData = JSON.parse(saved);
+                } catch (e) {
+                    commentsData = {};
+                }
+            }
+        }
+
+        function saveComments() {
+            localStorage.setItem('jejak_langkah_comments_global_v1', JSON.stringify(commentsData));
+        }
+
+        /* --- VISITOR ANALYTICS LOGIC --- */
+        function loadAnalytics() {
+            const saved = localStorage.getItem('jejak_langkah_analytics_v1');
+            if (saved) {
+                try {
+                    analyticsData = JSON.parse(saved);
+                } catch (e) {
+                    analyticsData = { totalViews: 0, uniqueVisitors: 0, dailyViews: {}, bookViews: {} };
+                }
+            }
+        }
+
+        function saveAnalytics() {
+            localStorage.setItem('jejak_langkah_analytics_v1', JSON.stringify(analyticsData));
+        }
+
+        function recordVisit() {
+            analyticsData.totalViews = (analyticsData.totalViews || 0) + 1;
+
+            if (!sessionStorage.getItem('visited_session')) {
+                sessionStorage.setItem('visited_session', 'true');
+                analyticsData.uniqueVisitors = (analyticsData.uniqueVisitors || 0) + 1;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            if (!analyticsData.dailyViews) analyticsData.dailyViews = {};
+            analyticsData.dailyViews[today] = (analyticsData.dailyViews[today] || 0) + 1;
+
+            saveAnalytics();
+        }
+
+        function recordBookRead(bookId) {
+            if (!analyticsData.bookViews) analyticsData.bookViews = {};
+            analyticsData.bookViews[bookId] = (analyticsData.bookViews[bookId] || 0) + 1;
+            saveAnalytics();
+        }
+
+        function openStatsModal() {
+            if (!isAdminMode) return;
+
+            document.getElementById('stat-total-views').textContent = analyticsData.totalViews || 0;
+            document.getElementById('stat-unique-visitors').textContent = analyticsData.uniqueVisitors || 0;
+            document.getElementById('stat-total-books').textContent = books.length;
+
+            let commentSum = 0;
+            Object.keys(commentsData).forEach(key => {
+                commentSum += (commentsData[key] || []).length;
+            });
+            document.getElementById('stat-total-comments').textContent = commentSum;
+
+            const tbody = document.getElementById('daily-views-tbody');
+            tbody.innerHTML = '';
+            const dailyEntries = Object.entries(analyticsData.dailyViews || {}).sort().reverse().slice(0, 7);
+
+            if (dailyEntries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="py-4 text-center text-stone-400 italic">Belum ada catatan harian.</td></tr>`;
+            } else {
+                dailyEntries.forEach(([dateStr, count]) => {
+                    const row = document.createElement('tr');
+                    const formattedDate = new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                    row.innerHTML = `
+                        <td class="py-2.5 px-4 font-medium">${formattedDate}</td>
+                        <td class="py-2.5 px-4 text-right font-bold text-amber-800 dark:text-amber-400">${count} Kali Views</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            const popContainer = document.getElementById('book-popularity-container');
+            popContainer.innerHTML = '';
+
+            if (books.length === 0) {
+                popContainer.innerHTML = `<p class="text-xs text-stone-400 italic">Belum ada buku.</p>`;
+            } else {
+                books.forEach(b => {
+                    const views = (analyticsData.bookViews && analyticsData.bookViews[b.id]) ? analyticsData.bookViews[b.id] : 0;
+                    const el = document.createElement('div');
+                    el.className = "flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-800/60 rounded-xl border border-stone-200 dark:border-stone-700/80 text-xs";
+                    el.innerHTML = `
+                        <span class="font-medium text-stone-800 dark:text-stone-200 truncate pr-2">${b.title}</span>
+                        <span class="bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 font-bold px-2.5 py-1 rounded-lg text-[11px] shrink-0">
+                            ${views}x Dilihat
+                        </span>
+                    `;
+                    popContainer.appendChild(el);
+                });
+            }
+
+            document.getElementById('stats-modal').classList.remove('hidden');
+        }
+
+        function closeStatsModal() {
+            document.getElementById('stats-modal').classList.add('hidden');
+        }
+
+        function resetAnalyticsData() {
+            if (!confirm("Apakah Anda yakin ingin menghapus seluruh data statistik kunjungan?")) return;
+            analyticsData = { totalViews: 0, uniqueVisitors: 0, dailyViews: {}, bookViews: {} };
+            saveAnalytics();
+            openStatsModal();
+        }
+
+        /* --- ADMIN MODE TOGGLE LOGIC --- */
+        function handleAdminToggle() {
+            if (isAdminMode) {
+                isAdminMode = false;
+                updateAdminUI();
+            } else {
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('pin-modal').classList.remove('hidden');
+                document.getElementById('admin-pin-input').focus();
+            }
+        }
+
+        function verifyAdminPin() {
+            const input = document.getElementById('admin-pin-input').value;
+            if (input === DEFAULT_PIN) {
+                isAdminMode = true;
+                closePinModal();
+                updateAdminUI();
+            } else {
+                alert("PIN Salah! Akses ditolak.");
+            }
+        }
+
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.add('hidden');
+        }
+
+        function updateAdminUI() {
+            const adminAddBtn = document.getElementById('admin-add-book-btn');
+            const adminStatsBtn = document.getElementById('admin-stats-btn');
+            const adminEditContainer = document.getElementById('admin-edit-book-btn-container');
+            const statusText = document.getElementById('admin-status-text');
+            const adminIcon = document.getElementById('admin-icon');
+
+            if (isAdminMode) {
+                adminAddBtn.classList.remove('hidden');
+                if (adminStatsBtn) adminStatsBtn.classList.remove('hidden');
+                adminEditContainer.classList.remove('hidden');
+                statusText.textContent = "Mode Admin (Aktif)";
+                adminIcon.className = "fas fa-unlock text-green-400";
+            } else {
+                adminAddBtn.classList.add('hidden');
+                if (adminStatsBtn) adminStatsBtn.classList.add('hidden');
+                adminEditContainer.classList.add('hidden');
+                statusText.textContent = "Mode Admin (Off)";
+                adminIcon.className = "fas fa-user-lock text-amber-600 dark:text-amber-500";
+            }
+
+            renderComments(); 
+        }
+
+        function renderBooksGrid() {
+            const gridContainer = document.getElementById('books-grid');
+            gridContainer.innerHTML = '';
+
+            if (books.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="col-span-1 sm:col-span-2 text-center py-12 bg-stone-100 dark:bg-stone-900 rounded-3xl border border-dashed border-stone-300 dark:border-stone-800">
+                        <i class="fas fa-book-open text-4xl text-stone-400 mb-3"></i>
+                        <p class="text-stone-600 dark:text-stone-400 font-medium">Belum ada buku yang ditulis.</p>
+                        ${isAdminMode ? `<button onclick="openAddBookModal()" class="mt-4 px-4 py-2 bg-amber-800 text-white rounded-xl text-xs">Tulis Buku Pertama</button>` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            books.forEach(book => {
+                const card = document.createElement('div');
+                card.className = "book-card relative rounded-3xl overflow-hidden cursor-pointer group bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-xl aspect-[3/4] flex flex-col justify-end";
+                card.onclick = () => openReader(book.id);
+
+                card.innerHTML = `
+                    <img src="${book.cover}" alt="${book.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onerror="this.src='https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80'">
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity"></div>
+
+                    <div class="relative z-10 glass-blur p-5 sm:p-6 transition-all duration-300 group-hover:bg-slate-900/80">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[10px] font-bold tracking-widest uppercase text-amber-300">
+                                ${book.chapters ? book.chapters.length : 0} Bab Story
+                            </span>
+                            <i class="fas fa-book-reader text-xs text-amber-200 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                        <h3 class="font-display text-xl sm:text-2xl font-semibold text-white leading-snug drop-shadow-sm">
+                            ${book.title}
+                        </h3>
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+            });
+        }
+
+        function showSection(sectionId) {
+            const homeSection = document.getElementById('home-section');
+            const readerSection = document.getElementById('reader-section');
+
+            if (sectionId === 'home') {
+                homeSection.classList.remove('hidden');
+                readerSection.classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (sectionId === 'reader') {
+                homeSection.classList.add('hidden');
+                readerSection.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function openReader(bookId) {
+            const book = books.find(b => b.id === bookId);
+            if (!book) return;
+
+            currentBookId = bookId;
+            currentChapterIndex = 0;
+
+            recordBookRead(bookId);
+
+            document.getElementById('reader-book-title').textContent = book.title;
+
+            renderChapterSidebar(book);
+            loadChapterContent();
+            showSection('reader');
+        }
+
+        function renderChapterSidebar(book) {
+            const listContainer = document.getElementById('chapters-list');
+            listContainer.innerHTML = '';
+
+            if (!book.chapters || book.chapters.length === 0) {
+                listContainer.innerHTML = '<p class="text-xs text-stone-400 italic">Belum ada bab.</p>';
+                return;
+            }
+
+            book.chapters.forEach((ch, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                    idx === currentChapterIndex 
+                    ? 'bg-amber-800 text-white dark:bg-amber-700 shadow-sm' 
+                    : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+                }`;
+                btn.onclick = () => {
+                    currentChapterIndex = idx;
+                    loadChapterContent();
+                };
+                btn.innerHTML = `<span class="opacity-70 mr-1.5">#${idx+1}</span> ${ch.title}`;
+                listContainer.appendChild(btn);
+            });
+        }
+
+        function loadChapterContent() {
+            const book = books.find(b => b.id === currentBookId);
+            if (!book || !book.chapters || book.chapters.length === 0) return;
+
+            const ch = book.chapters[currentChapterIndex];
+            document.getElementById('reader-chapter-number').textContent = `BAB ${currentChapterIndex + 1}`;
+            document.getElementById('reader-chapter-title').textContent = ch.title;
+
+            const contentContainer = document.getElementById('reader-chapter-content');
+            contentContainer.innerHTML = '';
+
+            if (ch.blocks && ch.blocks.length > 0) {
+                ch.blocks.forEach(block => {
+                    if (block.type === 'text') {
+                        const p = document.createElement('p');
+                        p.className = "font-serif text-base sm:text-lg text-stone-700 dark:text-stone-300 leading-relaxed sm:leading-loose whitespace-pre-line";
+                        p.textContent = block.content;
+                        contentContainer.appendChild(p);
+                    } else if (block.type === 'image') {
+                        const figure = document.createElement('figure');
+                        figure.className = "my-6 space-y-2";
+                        figure.innerHTML = `
+                            <div class="overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-900 shadow-md">
+                                <img src="${block.url}" alt="${block.caption || 'Foto Perjalanan'}" class="zoomable-image w-full h-auto max-h-[500px] object-cover" onclick="openLightbox('${block.url}', '${block.caption ? block.caption.replace(/'/g, "\\'") : ''}')">
+                            </div>
+                            ${block.caption ? `<figcaption class="text-center text-xs font-serif italic text-stone-500 dark:text-stone-400 px-2">${block.caption}</figcaption>` : ''}
+                        `;
+                        contentContainer.appendChild(figure);
+                    }
+                });
+            } else {
+                contentContainer.innerHTML = `<p class="font-serif text-stone-500 italic">Bab ini belum memiliki konten teks atau foto.</p>`;
+            }
+
+            document.getElementById('chapter-progress-text').textContent = `Bab ${currentChapterIndex + 1} dari ${book.chapters.length}`;
+            document.getElementById('prev-chapter-btn').disabled = currentChapterIndex === 0;
+            document.getElementById('next-chapter-btn').disabled = currentChapterIndex === book.chapters.length - 1;
+
+            renderChapterSidebar(book);
+            renderComments();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function navigateChapter(direction) {
+            const book = books.find(b => b.id === currentBookId);
+            if (!book) return;
+
+            const newIndex = currentChapterIndex + direction;
+            if (newIndex >= 0 && newIndex < book.chapters.length) {
+                currentChapterIndex = newIndex;
+                loadChapterContent();
+            }
+        }
+
+        function openLightbox(url, caption) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-caption').textContent = caption || '';
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+        }
+
+        /* --- GLOBAL BOOK COMMENTS SYSTEM LOGIC --- */
+        function getCommentKey() {
+            return `book_comment_global_${currentBookId}`;
+        }
+
+        function renderComments() {
+            const key = getCommentKey();
+            const comments = commentsData[key] || [];
+            const container = document.getElementById('comments-list-container');
+            const badge = document.getElementById('comment-count-badge');
+
+            if (badge) badge.textContent = `${comments.length} Komentar`;
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (comments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 bg-stone-50 dark:bg-stone-800/50 rounded-2xl border border-dashed border-stone-200 dark:border-stone-800">
+                        <i class="fas fa-ghost text-2xl text-stone-400 mb-2"></i>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">Belum ada komentar untuk buku ini. Silakan tulis kesan atau tanggapan Anda!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            comments.forEach((c) => {
+                const commentEl = document.createElement('div');
+                commentEl.className = "bg-stone-50 dark:bg-stone-800/80 p-4 rounded-2xl border border-stone-200/80 dark:border-stone-700/80 space-y-2 fade-in";
+                
+                const isAnon = c.author === 'Anonim';
+                const avatarIcon = isAnon ? 'fa-user-secret' : 'fa-user';
+                const avatarBg = isAnon ? 'bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300' : 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300';
+
+                commentEl.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-full ${avatarBg} flex items-center justify-center text-xs">
+                                <i class="fas ${avatarIcon}"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-semibold text-stone-900 dark:text-stone-100">${c.author}</span>
+                                ${isAnon ? '<span class="ml-1.5 text-[9px] bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-1.5 py-0.5 rounded font-mono">Anonim</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] text-stone-400">${c.timestamp}</span>
+                            ${isAdminMode ? `
+                                <button onclick="deleteComment('${c.id}')" class="text-stone-400 hover:text-red-500 text-xs p-1" title="Hapus Komentar (Admin)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <p class="text-xs text-stone-700 dark:text-stone-300 leading-relaxed pl-9 font-sans whitespace-pre-line">${c.text}</p>
+                `;
+                container.appendChild(commentEl);
+            });
+        }
+
+        function toggleAnonymousCheckbox(checkbox) {
+            const authorInput = document.getElementById('comment-author-input');
+            if (checkbox.checked) {
+                authorInput.value = '';
+                authorInput.disabled = true;
+                authorInput.placeholder = 'Anonim';
+            } else {
+                authorInput.disabled = false;
+                authorInput.placeholder = 'Ketik Nama Anda...';
+                authorInput.focus();
+            }
+        }
+
+        function submitComment(event) {
+            event.preventDefault();
+
+            const isAnon = document.getElementById('is-anonymous-checkbox').checked;
+            const authorInput = document.getElementById('comment-author-input').value.trim();
+            const textInput = document.getElementById('comment-text-input').value.trim();
+
+            if (!textInput) return;
+
+            const author = isAnon || !authorInput ? 'Anonim' : authorInput;
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            const newComment = {
+                id: 'comm-' + Date.now(),
+                author: author,
+                text: textInput,
+                timestamp: formattedDate
+            };
+
+            const key = getCommentKey();
+            if (!commentsData[key]) {
+                commentsData[key] = [];
+            }
+
+            commentsData[key].unshift(newComment);
+            saveComments();
+
+            document.getElementById('comment-text-input').value = '';
+            renderComments();
+        }
+
+        function deleteComment(commentId) {
+            if (!isAdminMode) return;
+            const key = getCommentKey();
+            if (!commentsData[key]) return;
+
+            commentsData[key] = commentsData[key].filter(c => c.id !== commentId);
+            saveComments();
+            renderComments();
+        }
+
+        /* --- ADMIN BOOK EDITING & MODAL LOGIC --- */
+        function openAddBookModal() {
+            if (!isAdminMode) return;
+            document.getElementById('modal-heading').textContent = "Tulis Buku Perjalanan Baru";
+            document.getElementById('edit-book-id').value = "";
+            document.getElementById('form-book-title').value = "";
+            document.getElementById('form-book-cover-url').value = "";
+            document.getElementById('form-book-cover-file').value = "";
+            document.getElementById('delete-book-btn').classList.add('hidden');
+            uploadedCoverBase64 = null;
+
+            const container = document.getElementById('chapters-form-container');
+            container.innerHTML = '';
+            addChapterInput("Bab 1: Judul Awal", [
+                { type: 'text', content: '' },
+                { type: 'image', url: '', caption: '' }
+            ]);
+
+            document.getElementById('book-modal').classList.remove('hidden');
+        }
+
+        function editCurrentBook() {
+            if (!isAdminMode) return;
+            const book = books.find(b => b.id === currentBookId);
+            if (!book) return;
+
+            document.getElementById('modal-heading').textContent = "Edit Buku & Foto Perjalanan";
+            document.getElementById('edit-book-id').value = book.id;
+            document.getElementById('form-book-title').value = book.title;
+            document.getElementById('form-book-cover-url').value = book.cover.startsWith('data:') ? '' : book.cover;
+            document.getElementById('form-book-cover-file').value = "";
+            document.getElementById('delete-book-btn').classList.remove('hidden');
+            uploadedCoverBase64 = book.cover.startsWith('data:') ? book.cover : null;
+
+            const container = document.getElementById('chapters-form-container');
+            container.innerHTML = '';
+
+            if (book.chapters && book.chapters.length > 0) {
+                book.chapters.forEach(ch => {
+                    addChapterInput(ch.title, ch.blocks);
+                });
+            } else {
+                addChapterInput("Bab 1: Judul Awal", []);
+            }
+
+            document.getElementById('book-modal').classList.remove('hidden');
+        }
+
+        function closeBookModal() {
+            document.getElementById('book-modal').classList.add('hidden');
+        }
+
+        function handleCoverUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedCoverBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addChapterInput(title = "", blocks = []) {
+            const container = document.getElementById('chapters-form-container');
+            const chapterIdx = container.children.length;
+
+            const chapterDiv = document.createElement('div');
+            chapterDiv.className = "chapter-entry bg-stone-50 dark:bg-stone-800 p-4 rounded-2xl border border-stone-200 dark:border-stone-700 space-y-4 relative";
+            chapterDiv.setAttribute('data-chapter-index', chapterIdx);
+
+            chapterDiv.innerHTML = `
+                <div class="flex items-center justify-between border-b border-stone-200 dark:border-stone-700 pb-2">
+                    <span class="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase">Bab ${chapterIdx + 1}</span>
+                    <button type="button" onclick="this.closest('.chapter-entry').remove()" class="text-xs text-red-500 hover:text-red-700 font-medium">
+                        <i class="fas fa-trash"></i> Hapus Bab
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-stone-400 mb-1">Judul Bab</label>
+                    <input type="text" placeholder="misal: Bab 1: Masa Kecil" value="${title}" class="chapter-title w-full px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-amber-800">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-[10px] uppercase font-bold text-stone-400">Konten Teks & Foto Perjalanan</label>
+                        <div class="flex space-x-2">
+                            <button type="button" onclick="addTextBlock(this)" class="px-2 py-1 bg-stone-200 dark:bg-stone-700 hover:bg-stone-300 dark:hover:bg-stone-600 rounded-md text-[11px] font-semibold text-stone-700 dark:text-stone-200">
+                                + Paragraf Teks
+                            </button>
+                            <button type="button" onclick="addImageBlock(this)" class="px-2 py-1 bg-amber-100 dark:bg-amber-950 hover:bg-amber-200 text-amber-900 dark:text-amber-300 rounded-md text-[11px] font-semibold">
+                                + Sisipkan Foto
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="blocks-container space-y-3">
+                        <!-- Content Blocks -->
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(chapterDiv);
+            const blocksContainer = chapterDiv.querySelector('.blocks-container');
+
+            if (blocks && blocks.length > 0) {
+                blocks.forEach(b => {
+                    if (b.type === 'text') {
+                        renderTextBlockUI(blocksContainer, b.content);
+                    } else if (b.type === 'image') {
+                        renderImageBlockUI(blocksContainer, b.url, b.caption);
+                    }
+                });
+            } else {
+                renderTextBlockUI(blocksContainer, '');
+            }
+        }
+
+        function addTextBlock(btn) {
+            const blocksContainer = btn.closest('.chapter-entry').querySelector('.blocks-container');
+            renderTextBlockUI(blocksContainer, '');
+        }
+
+        function addImageBlock(btn) {
+            const blocksContainer = btn.closest('.chapter-entry').querySelector('.blocks-container');
+            renderImageBlockUI(blocksContainer, '', '');
+        }
+
+        function renderTextBlockUI(container, content = '') {
+            const blockDiv = document.createElement('div');
+            blockDiv.className = "block-item block-text relative bg-white dark:bg-stone-900 p-3 rounded-xl border border-stone-200 dark:border-stone-700";
+            blockDiv.setAttribute('data-type', 'text');
+            blockDiv.innerHTML = `
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-semibold text-stone-400"><i class="fas fa-align-left mr-1"></i> Paragraf Teks</span>
+                    <button type="button" onclick="this.closest('.block-item').remove()" class="text-[10px] text-stone-400 hover:text-red-500"><i class="fas fa-times"></i> Hapus</button>
+                </div>
+                <textarea rows="3" placeholder="Tuliskan cerita paragraf di sini..." class="block-content-text w-full px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-1 focus:ring-amber-800 leading-relaxed">${content}</textarea>
+            `;
+            container.appendChild(blockDiv);
+        }
+
+        function renderImageBlockUI(container, url = '', caption = '') {
+            const blockDiv = document.createElement('div');
+            blockDiv.className = "block-item block-image relative bg-amber-50/50 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200 dark:border-amber-900/40 space-y-2";
+            blockDiv.setAttribute('data-type', 'image');
+            
+            blockDiv.innerHTML = `
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-[10px] font-semibold text-amber-800 dark:text-amber-400"><i class="fas fa-image mr-1"></i> Foto Perjalanan</span>
+                    <button type="button" onclick="this.closest('.block-item').remove()" class="text-[10px] text-stone-400 hover:text-red-500"><i class="fas fa-times"></i> Hapus</button>
+                </div>
+                <input type="text" placeholder="URL Foto (https://...)" value="${url.startsWith('data:') ? '' : url}" class="block-image-url w-full px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-1 focus:ring-amber-800">
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-stone-400">Atau upload foto:</span>
+                    <input type="file" accept="image/*" onchange="handleBlockImageUpload(event, this)" class="text-[10px] text-stone-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:bg-amber-200 file:text-amber-900 cursor-pointer">
+                </div>
+                <input type="hidden" class="block-image-base64" value="${url.startsWith('data:') ? url : ''}">
+                <input type="text" placeholder="Keterangan / Caption Foto (opsional)" value="${caption}" class="block-image-caption w-full px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-1 focus:ring-amber-800 italic">
+            `;
+            container.appendChild(blockDiv);
+        }
+
+        function handleBlockImageUpload(event, inputEl) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const blockDiv = inputEl.closest('.block-item');
+                    blockDiv.querySelector('.block-image-base64').value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleBookSubmit(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('edit-book-id').value;
+            const title = document.getElementById('form-book-title').value.trim();
+            const urlCover = document.getElementById('form-book-cover-url').value.trim();
+
+            let cover = uploadedCoverBase64 || urlCover || "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80";
+
+            const chapterElements = document.querySelectorAll('.chapter-entry');
+            const chapters = [];
+
+            chapterElements.forEach(chEl => {
+                const chTitle = chEl.querySelector('.chapter-title').value.trim();
+                const blockElements = chEl.querySelectorAll('.block-item');
+                const blocks = [];
+
+                blockElements.forEach(bEl => {
+                    const type = bEl.getAttribute('data-type');
+                    if (type === 'text') {
+                        const txt = bEl.querySelector('.block-content-text').value.trim();
+                        if (txt) {
+                            blocks.push({ type: 'text', content: txt });
+                        }
+                    } else if (type === 'image') {
+                        const imgUrl = bEl.querySelector('.block-image-url').value.trim();
+                        const imgBase64 = bEl.querySelector('.block-image-base64').value;
+                        const caption = bEl.querySelector('.block-image-caption').value.trim();
+                        
+                        const finalImgUrl = imgBase64 || imgUrl;
+                        if (finalImgUrl) {
+                            blocks.push({
+                                type: 'image',
+                                url: finalImgUrl,
+                                caption: caption
+                            });
+                        }
+                    }
+                });
+
+                if (chTitle || blocks.length > 0) {
+                    chapters.push({
+                        title: chTitle || "Bab Tanpa Judul",
+                        blocks: blocks
+                    });
+                }
+            });
+
+            if (bookId) {
+                const index = books.findIndex(b => b.id === bookId);
+                if (index !== -1) {
+                    books[index].title = title;
+                    books[index].cover = cover;
+                    books[index].chapters = chapters;
+                }
+            } else {
+                const newBook = {
+                    id: 'book-' + Date.now(),
+                    title: title,
+                    cover: cover,
+                    chapters: chapters
+                };
+                books.push(newBook);
+            }
+
+            saveBooks();
+            renderBooksGrid();
+            closeBookModal();
+
+            if (bookId && currentBookId === bookId) {
+                openReader(bookId);
+            }
+        }
+
+        function deleteCurrentBookModal() {
+            const bookId = document.getElementById('edit-book-id').value;
+            if (!bookId) return;
+
+            books = books.filter(b => b.id !== bookId);
+            saveBooks();
+            renderBooksGrid();
+            closeBookModal();
+            showSection('home');
+        }
+
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fas fa-sun text-lg';
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').className = 'fas fa-moon text-lg';
+            }
+        }
+
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                document.getElementById('theme-icon').className = 'fas fa-moon text-lg';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                document.getElementById('theme-icon').className = 'fas fa-sun text-lg';
+            }
+        }
+    </script>
+</body>
+</html>
